@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Building2, Image, MessageSquare, Home } from 'lucide-react';
+import { Building2, Image, MessageSquare, Home, Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import { Button } from './ui/button';
 
 const Layout = () => {
   const location = useLocation();
+  const [open, setOpen] = useState(false);
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: Home },
@@ -18,46 +22,78 @@ const Layout = () => {
     return location.pathname.startsWith(path);
   };
 
+  const NavLinks = ({ mobile = false }: { mobile?: boolean }) => (
+    <>
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const active = isActive(item.path);
+        return (
+          <Link
+            key={item.path}
+            to={item.path}
+            onClick={() => mobile && setOpen(false)}
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              active
+                ? 'bg-primary text-primary-foreground font-medium'
+                : 'text-foreground hover:bg-accent'
+            }`}
+          >
+            <Icon className="w-5 h-5" />
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
+    </>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Nyxta CMS</h1>
-            <div className="text-sm text-gray-500">Hostel Management System</div>
+      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4 flex-1">
+            {/* Mobile Menu Button */}
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild className="lg:hidden">
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[280px] sm:w-[320px]">
+                <nav className="flex flex-col space-y-2 mt-6">
+                  <NavLinks mobile />
+                </nav>
+              </SheetContent>
+            </Sheet>
+
+            {/* Logo */}
+            <div className="flex items-center">
+              <Building2 className="h-6 w-6 mr-2 text-primary" />
+              <h1 className="text-xl font-bold">Nyxta CMS</h1>
+            </div>
+          </div>
+
+          {/* Desktop: Hostel Management System text */}
+          <div className="hidden md:block text-sm text-muted-foreground">
+            Hostel Management System
           </div>
         </div>
       </header>
 
       <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-sm min-h-[calc(100vh-73px)]">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:block w-64 border-r bg-background min-h-[calc(100vh-4rem)] sticky top-16">
           <nav className="p-4 space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                    active
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+            <NavLinks />
           </nav>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
-          <Outlet />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto max-w-7xl">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
