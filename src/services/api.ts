@@ -7,12 +7,9 @@ import type {
   GalleryInput,
   UserEnquiry,
   UserEnquiryInput,
-  ImageHippoUploadResponse,
-  ImageHippoDeleteResponse,
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
-const IMGHIPPO_API_KEY = import.meta.env.VITE_IMGHIPPO_API;
 
 // Create axios instance for backend API
 const api = axios.create({
@@ -22,40 +19,62 @@ const api = axios.create({
   },
 });
 
-// Create axios instance for ImageHippo
-const imageApi = axios.create({
-  baseURL: 'https://api.imghippo.com/v1',
-  headers: {
-    Authorization: `Bearer ${IMGHIPPO_API_KEY}`,
-  },
-});
+// ============= Image upload / host deletion via backend =============
 
-// ============= ImageHippo API =============
-
+/**
+ * Uploads an image file to the backend which will forward/store it and
+ * create a gallery entry. The backend expects multipart/form-data and
+ * returns the created Gallery entry in the usual ApiResponse.data.
+ */
 export const imageService = {
-  /**
-   * Upload image to ImageHippo
-   */
-  async uploadImage(file: File): Promise<ImageHippoUploadResponse> {
+  async uploadImage(
+    file: File,
+    options?: {
+      branch_id?: number;
+      branch_name?: string;
+      title?: string;
+      description?: string;
+      tags?: string | string[];
+      display_order?: number;
+    }
+  ) {
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append('file', file);
+    if (options?.branch_id) formData.append('branch_id', String(options.branch_id));
+    if (options?.branch_name) formData.append('branch_name', options.branch_name);
+    if (options?.title) formData.append('title', options.title);
+    if (options?.description) formData.append('description', options.description);
+    if (options?.tags) {
+      if (Array.isArray(options.tags)) formData.append('tags', options.tags.join(','));
+      else formData.append('tags', String(options.tags));
+    }
+    if (typeof options?.display_order !== 'undefined') formData.append('display_order', String(options.display_order));
 
-    const response = await imageApi.post<ImageHippoUploadResponse>('/upload', formData, {
+    const response = await api.post<ApiResponse<any>>('/api/gallery/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
 
-    return response.data;
+    if (!response.data || !response.data.data) {
+      throw new Error(response.data?.error || 'Failed to upload image');
+    }
+
+    // Backend returns the created gallery entry in data
+    return response.data.data;
   },
 
   /**
-   * Delete image from ImageHippo
+   * Ask backend to delete the hosted image from the image host (ImageHippo)
    */
-  async deleteImage(imageUrl: string): Promise<ImageHippoDeleteResponse> {
-    const response = await imageApi.post<ImageHippoDeleteResponse>('/delete', {
-      url: imageUrl,
+  async deleteImageFromHost(imageUrl: string) {
+    const response = await api.delete<ApiResponse<any>>('/api/gallery/delete-from-host', {
+      data: { image_url: imageUrl },
     });
+
+    if (!response.data) {
+      throw new Error('Failed to delete image from host');
+    }
 
     return response.data;
   },
@@ -175,17 +194,18 @@ export const galleryService = {
     tags?: string[],
     displayOrder?: number
   ): Promise<Gallery> {
-    // Upload to ImageHippo first
-    const uploadResponse = await imageService.uploadImage(file);
-
-    // Create gallery entry with the returned URL
-    return this.create({
+    // Send file to backend upload endpoint. Backend will upload/store and
+    // create the gallery entry and return it in the response.
+    const galleryEntry = await imageService.uploadImage(file, {
       branch_id: branchId,
-      image_url: uploadResponse.data.url,
-      title: title || uploadResponse.data.title,
+      title,
       tags,
       display_order: displayOrder,
     });
+
+    // If backend returned the gallery entry directly, return it.
+    // If it returned an intermediate structure, try to normalize.
+    return galleryEntry as Gallery;
   },
 };
 

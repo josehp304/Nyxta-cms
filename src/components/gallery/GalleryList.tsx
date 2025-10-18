@@ -91,11 +91,11 @@ const GalleryList = () => {
       // Delete from database
       await galleryService.delete(deleteDialog.gallery.id);
       
-      // Try to delete from ImageHippo (optional, might fail if image doesn't exist)
+      // Ask backend to delete the hosted image (backend will call ImageHippo)
       try {
-        await imageService.deleteImage(deleteDialog.gallery.image_url);
+        await imageService.deleteImageFromHost(deleteDialog.gallery.image_url);
       } catch {
-        // Ignore ImageHippo delete errors
+        // Ignore host deletion errors
       }
 
       setGalleries(galleries.filter((g) => g.id !== deleteDialog.gallery!.id));
