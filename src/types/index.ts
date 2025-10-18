@@ -17,6 +17,7 @@ export interface RoomRate {
 export interface Branch {
   id: number;
   name: string;
+  thumbnail?: string;
   contact_no: string[];
   email?: string;
   address: string;

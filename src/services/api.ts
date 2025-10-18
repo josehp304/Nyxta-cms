@@ -103,25 +103,88 @@ export const branchService = {
   },
 
   /**
-   * Create new branch
+   * Create new branch (supports multipart/form-data for thumbnail upload)
    */
-  async create(data: BranchInput): Promise<Branch> {
-    const response = await api.post<ApiResponse<Branch>>('/api/branches', data);
-    if (!response.data.data) {
-      throw new Error('Failed to create branch');
+  async create(data: BranchInput, thumbnailFile?: File): Promise<Branch> {
+    if (thumbnailFile) {
+      // Send as multipart/form-data with thumbnail
+      const formData = new FormData();
+      formData.append('thumbnail', thumbnailFile);
+      
+      // Append all other fields as JSON strings
+      formData.append('name', data.name);
+      formData.append('contact_no', JSON.stringify(data.contact_no));
+      formData.append('address', data.address);
+      formData.append('room_rate', JSON.stringify(data.room_rate));
+      formData.append('reg_fee', String(data.reg_fee));
+      formData.append('is_mess_available', String(data.is_mess_available));
+      
+      if (data.email) formData.append('email', data.email);
+      if (data.mess_price) formData.append('mess_price', String(data.mess_price));
+      if (data.prime_location_perk) formData.append('prime_location_perk', data.prime_location_perk);
+      if (data.amenities) formData.append('amenities', JSON.stringify(data.amenities));
+      if (data.landmark) formData.append('landmark', data.landmark);
+      if (data.latitude) formData.append('latitude', String(data.latitude));
+      if (data.longitude) formData.append('longitude', String(data.longitude));
+
+      const response = await api.post<ApiResponse<Branch>>('/api/branches', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      
+      if (!response.data.data) {
+        throw new Error('Failed to create branch');
+      }
+      return response.data.data;
+    } else {
+      // Send as JSON without thumbnail
+      const response = await api.post<ApiResponse<Branch>>('/api/branches', data);
+      if (!response.data.data) {
+        throw new Error('Failed to create branch');
+      }
+      return response.data.data;
     }
-    return response.data.data;
   },
 
   /**
-   * Update existing branch
+   * Update existing branch (supports multipart/form-data for thumbnail upload)
    */
-  async update(id: number, data: Partial<BranchInput>): Promise<Branch> {
-    const response = await api.put<ApiResponse<Branch>>(`/api/branches/${id}`, data);
-    if (!response.data.data) {
-      throw new Error('Failed to update branch');
+  async update(id: number, data: Partial<BranchInput>, thumbnailFile?: File): Promise<Branch> {
+    if (thumbnailFile) {
+      // Send as multipart/form-data with thumbnail
+      const formData = new FormData();
+      formData.append('thumbnail', thumbnailFile);
+      
+      // Append all provided fields as JSON strings
+      if (data.name) formData.append('name', data.name);
+      if (data.contact_no) formData.append('contact_no', JSON.stringify(data.contact_no));
+      if (data.address) formData.append('address', data.address);
+      if (data.room_rate) formData.append('room_rate', JSON.stringify(data.room_rate));
+      if (data.reg_fee !== undefined) formData.append('reg_fee', String(data.reg_fee));
+      if (data.is_mess_available !== undefined) formData.append('is_mess_available', String(data.is_mess_available));
+      if (data.email) formData.append('email', data.email);
+      if (data.mess_price) formData.append('mess_price', String(data.mess_price));
+      if (data.prime_location_perk) formData.append('prime_location_perk', data.prime_location_perk);
+      if (data.amenities) formData.append('amenities', JSON.stringify(data.amenities));
+      if (data.landmark) formData.append('landmark', data.landmark);
+      if (data.latitude) formData.append('latitude', String(data.latitude));
+      if (data.longitude) formData.append('longitude', String(data.longitude));
+
+      const response = await api.put<ApiResponse<Branch>>(`/api/branches/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      
+      if (!response.data.data) {
+        throw new Error('Failed to update branch');
+      }
+      return response.data.data;
+    } else {
+      // Send as JSON without thumbnail
+      const response = await api.put<ApiResponse<Branch>>(`/api/branches/${id}`, data);
+      if (!response.data.data) {
+        throw new Error('Failed to update branch');
+      }
+      return response.data.data;
     }
-    return response.data.data;
   },
 
   /**

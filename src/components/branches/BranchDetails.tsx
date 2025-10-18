@@ -68,6 +68,22 @@ const BranchDetails = () => {
         </div>
       </div>
 
+      {/* Hero Thumbnail */}
+      {branch.thumbnail && (
+        <Card className="overflow-hidden">
+          <div className="relative aspect-video bg-gray-100">
+            <img
+              src={branch.thumbnail}
+              alt={branch.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/1200x800?text=Image+Not+Found';
+              }}
+            />
+          </div>
+        </Card>
+      )}
+
       {/* Top summary card */}
       <Card>
         <CardHeader>

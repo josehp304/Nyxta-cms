@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { ArrowLeft, Plus, X, Upload } from 'lucide-react';
 import { branchService } from '../../services/api';
 import type { Branch } from '../../types';
 import LoadingSpinner from '../LoadingSpinner';
 import ErrorMessage from '../ErrorMessage';
 
-type BranchFormData = Omit<Branch, 'id' | 'created_at' | 'updated_at'>;
+type BranchFormData = Omit<Branch, 'id' | 'created_at' | 'updated_at' | 'thumbnail'>;
 
 const BranchForm = () => {
   const { id } = useParams();
@@ -17,6 +17,9 @@ const BranchForm = () => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(isEditMode);
   const [error, setError] = useState<string | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [currentThumbnail, setCurrentThumbnail] = useState<string | null>(null);
 
   const {
     register,
@@ -67,6 +70,12 @@ const BranchForm = () => {
     try {
       setInitialLoading(true);
       const branch = await branchService.getById(Number(id));
+      
+      if (branch.thumbnail) {
+        setCurrentThumbnail(branch.thumbnail);
+        setThumbnailPreview(branch.thumbnail);
+      }
+      
       reset({
         name: branch.name,
         contact_no: branch.contact_no.length > 0 ? branch.contact_no : [''],
@@ -89,6 +98,26 @@ const BranchForm = () => {
     }
   };
 
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setThumbnailFile(file);
+      // Show preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setThumbnailPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveThumbnail = () => {
+    setThumbnailFile(null);
+    setThumbnailPreview(currentThumbnail); // Revert to original if editing
+    const fileInput = document.getElementById('thumbnail-input') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  };
+
   const onSubmit = async (data: BranchFormData) => {
     try {
       setLoading(true);
@@ -102,9 +131,9 @@ const BranchForm = () => {
       };
 
       if (isEditMode) {
-        await branchService.update(Number(id), cleanedData);
+        await branchService.update(Number(id), cleanedData, thumbnailFile || undefined);
       } else {
-        await branchService.create(cleanedData);
+        await branchService.create(cleanedData, thumbnailFile || undefined);
       }
 
       navigate('/branches');
@@ -135,6 +164,52 @@ const BranchForm = () => {
         {error && <ErrorMessage message={error} />}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Thumbnail Upload */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">Branch Thumbnail</h3>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Upload Thumbnail Image (Optional)
+              </label>
+              
+              {thumbnailPreview ? (
+                <div className="relative inline-block">
+                  <img
+                    src={thumbnailPreview}
+                    alt="Thumbnail preview"
+                    className="w-full max-w-md h-48 object-cover rounded-lg border border-gray-300"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveThumbnail}
+                    className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="w-full max-w-md h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                  <div className="text-center">
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">No image selected</p>
+                  </div>
+                </div>
+              )}
+              
+              <input
+                id="thumbnail-input"
+                type="file"
+                accept="image/*"
+                onChange={handleThumbnailChange}
+                className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Recommended: 1200x800px (16:9), Max 5MB, JPG/PNG/WEBP
+              </p>
+            </div>
+          </div>
+
           {/* Basic Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
