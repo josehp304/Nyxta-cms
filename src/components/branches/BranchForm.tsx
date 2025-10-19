@@ -39,6 +39,7 @@ const BranchForm = () => {
       mess_price: 0,
       prime_location_perks: [{ title: '', distance: '', time_to_reach: '' }],
       amenities: [''],
+      gmap_link: '',
     },
   });
 
@@ -91,6 +92,7 @@ const BranchForm = () => {
           ? branch.prime_location_perks 
           : [{ title: '', distance: '', time_to_reach: '' }],
         amenities: branch.amenities && branch.amenities.length > 0 ? branch.amenities : [''],
+        gmap_link: branch.gmap_link || '',
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load branch');
@@ -240,6 +242,27 @@ const BranchForm = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Google Maps Link
+              </label>
+              <input
+                {...register('gmap_link', {
+                  pattern: {
+                    value: /^https?:\/\/.+/i,
+                    message: 'Please enter a valid URL',
+                  },
+                })}
+                type="url"
+                placeholder="https://maps.google.com/..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {errors.gmap_link && <p className="mt-1 text-sm text-red-600">{errors.gmap_link.message}</p>}
+              <p className="mt-1 text-xs text-gray-500">
+                Add a Google Maps link for easy navigation
+              </p>
             </div>
           </div>
 

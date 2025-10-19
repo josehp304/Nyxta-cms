@@ -108,6 +108,23 @@ const BranchDetails = () => {
                 <div className="font-medium">{branch.contact_no.join(', ')}</div>
               </div>
             )}
+
+            {branch.gmap_link && (
+              <div className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                <div>
+                  <div className="text-muted-foreground">Google Maps</div>
+                  <a
+                    href={branch.gmap_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-blue-600 hover:text-blue-800 underline"
+                  >
+                    View on Maps
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-3">

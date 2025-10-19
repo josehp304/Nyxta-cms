@@ -34,6 +34,8 @@ export interface Branch {
   mess_price?: number;
   prime_location_perks?: PrimeLocationPerk[];
   amenities?: string[];
+  property_features?: any;
+  gmap_link?: string;
   created_at?: string;
   updated_at?: string;
 }
