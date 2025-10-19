@@ -37,11 +37,8 @@ const BranchForm = () => {
       reg_fee: 0,
       is_mess_available: false,
       mess_price: 0,
-      prime_location_perk: '',
+      prime_location_perks: [{ title: '', distance: '', time_to_reach: '' }],
       amenities: [''],
-      landmark: '',
-      latitude: undefined,
-      longitude: undefined,
     },
   });
 
@@ -58,6 +55,11 @@ const BranchForm = () => {
   const { fields: amenityFields, append: appendAmenity, remove: removeAmenity } = useFieldArray<BranchFormData>({
     control,
     name: 'amenities' as any,
+  });
+
+  const { fields: primeLocationFields, append: appendPrimeLocation, remove: removePrimeLocation } = useFieldArray<BranchFormData>({
+    control,
+    name: 'prime_location_perks' as any,
   });
 
   useEffect(() => {
@@ -85,11 +87,10 @@ const BranchForm = () => {
         reg_fee: branch.reg_fee,
         is_mess_available: branch.is_mess_available,
         mess_price: branch.mess_price || 0,
-        prime_location_perk: branch.prime_location_perk || '',
+        prime_location_perks: branch.prime_location_perks && branch.prime_location_perks.length > 0 
+          ? branch.prime_location_perks 
+          : [{ title: '', distance: '', time_to_reach: '' }],
         amenities: branch.amenities && branch.amenities.length > 0 ? branch.amenities : [''],
-        landmark: branch.landmark || '',
-        latitude: branch.latitude,
-        longitude: branch.longitude,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load branch');
@@ -128,6 +129,9 @@ const BranchForm = () => {
         ...data,
         contact_no: data.contact_no.filter((c: string) => c.trim() !== ''),
         amenities: data.amenities?.filter((a: string) => a.trim() !== '') || [],
+        prime_location_perks: data.prime_location_perks?.filter(
+          (p: any) => p.title.trim() !== '' || p.distance.trim() !== '' || p.time_to_reach.trim() !== ''
+        ) || [],
       };
 
       if (isEditMode) {
@@ -236,36 +240,6 @@ const BranchForm = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Landmark</label>
-              <input
-                {...register('landmark')}
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
-                <input
-                  {...register('latitude', { valueAsNumber: true })}
-                  type="number"
-                  step="any"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
-                <input
-                  {...register('longitude', { valueAsNumber: true })}
-                  type="number"
-                  step="any"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
             </div>
           </div>
 
@@ -442,17 +416,65 @@ const BranchForm = () => {
             </button>
           </div>
 
-          {/* Prime Location Perk */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Prime Location Perk
-            </label>
-            <textarea
-              {...register('prime_location_perk')}
-              rows={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Describe what makes this location special..."
-            />
+          {/* Prime Location Perks */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">Prime Location Perks</h3>
+            {primeLocationFields.map((field, index) => (
+              <div key={field.id} className="flex items-start space-x-2 p-4 bg-gray-50 rounded-lg">
+                <div className="flex-1 grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Place Name
+                    </label>
+                    <input
+                      {...register(`prime_location_perks.${index}.title` as const)}
+                      type="text"
+                      placeholder="e.g., Metro Station"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Distance
+                    </label>
+                    <input
+                      {...register(`prime_location_perks.${index}.distance` as const)}
+                      type="text"
+                      placeholder="e.g., 500m"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Time to Reach
+                    </label>
+                    <input
+                      {...register(`prime_location_perks.${index}.time_to_reach` as const)}
+                      type="text"
+                      placeholder="e.g., 5 mins"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                {primeLocationFields.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removePrimeLocation(index)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => appendPrimeLocation({ title: '', distance: '', time_to_reach: '' })}
+              className="flex items-center space-x-2 text-blue-600 hover:text-blue-700"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Prime Location Perk</span>
+            </button>
           </div>
 
           {/* Submit Buttons */}

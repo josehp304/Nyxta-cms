@@ -42,11 +42,6 @@ const BranchDetails = () => {
   if (error) return <ErrorMessage message={error} onRetry={loadBranch} />;
   if (!branch) return <ErrorMessage message="Branch not found" onRetry={loadBranch} />;
 
-  const coords =
-    branch.latitude != null && branch.longitude != null
-      ? `${branch.latitude.toFixed(6)}, ${branch.longitude.toFixed(6)}`
-      : 'N/A';
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -97,7 +92,6 @@ const BranchDetails = () => {
               <div>
                 <div className="text-muted-foreground">Address</div>
                 <div className="font-medium">{branch.address}</div>
-                {branch.landmark && <div className="text-muted-foreground text-xs">Landmark: {branch.landmark}</div>}
               </div>
             </div>
 
@@ -133,16 +127,6 @@ const BranchDetails = () => {
                 <span className="font-semibold">{formatINR(branch.mess_price)}</span>
               </div>
             )}
-            {branch.prime_location_perk && (
-              <div className="flex items-start justify-between gap-4">
-                <span className="text-muted-foreground">Prime Location Perk</span>
-                <span className="font-medium text-right">{branch.prime_location_perk}</span>
-              </div>
-            )}
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Coordinates</span>
-              <span className="font-medium">{coords}</span>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -178,10 +162,10 @@ const BranchDetails = () => {
         <CardContent>
           {branch.amenities?.length ? (
             <div className="flex flex-wrap gap-2">
-              {branch.amenities.map((amenity, i) => (
+              {branch.amenities.map((amenity, idx) => (
                 <span
-                  key={`${amenity}-${i}`}
-                  className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium"
+                  key={`amenity-${idx}`}
+                  className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700"
                 >
                   {amenity}
                 </span>
@@ -192,6 +176,33 @@ const BranchDetails = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Prime Location Perks */}
+      {branch.prime_location_perks && branch.prime_location_perks.length > 0 && (
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-lg">Prime Location Perks</CardTitle>
+            <CardDescription>Nearby locations and accessibility</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {branch.prime_location_perks.map((perk, idx) => (
+                <div key={`perk-${idx}`} className="rounded-lg border p-4 space-y-2">
+                  <div className="font-semibold text-gray-900">{perk.title}</div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Distance:</span>
+                    <span className="font-medium">{perk.distance}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Time:</span>
+                    <span className="font-medium">{perk.time_to_reach}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Meta */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

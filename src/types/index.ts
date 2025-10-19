@@ -13,6 +13,13 @@ export interface RoomRate {
   rate_per_month: number;
 }
 
+// Prime Location Perk Type
+export interface PrimeLocationPerk {
+  title: string;
+  distance: string;
+  time_to_reach: string;
+}
+
 // Branch Type
 export interface Branch {
   id: number;
@@ -25,11 +32,8 @@ export interface Branch {
   reg_fee: number;
   is_mess_available: boolean;
   mess_price?: number;
-  prime_location_perk?: string;
+  prime_location_perks?: PrimeLocationPerk[];
   amenities?: string[];
-  landmark?: string;
-  latitude?: number;
-  longitude?: number;
   created_at?: string;
   updated_at?: string;
 }
