@@ -32,6 +32,10 @@ export interface Branch {
   reg_fee: number;
   is_mess_available: boolean;
   mess_price?: number;
+  is_ladies: boolean;
+  is_cooking: boolean;
+  cooking_price?: number | null;
+  display_order: number;
   prime_location_perks?: PrimeLocationPerk[];
   amenities?: string[];
   property_features?: any;

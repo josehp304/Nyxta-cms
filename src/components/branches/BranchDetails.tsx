@@ -128,22 +128,45 @@ const BranchDetails = () => {
           </div>
 
           <div className="space-y-3">
+            {/* Branch Type Badges */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {branch.is_ladies && (
+                <span className="inline-flex items-center rounded-full bg-pink-50 px-3 py-1 text-sm font-medium text-pink-700">
+                  👩 Ladies Hostel
+                </span>
+              )}
+              {branch.is_mess_available && (
+                <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                  🍽️ Mess Available
+                </span>
+              )}
+              {branch.is_cooking && (
+                <span className="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">
+                  👨‍🍳 Cooking Facilities
+                </span>
+              )}
+            </div>
+
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Registration Fee</span>
               <span className="font-semibold">{formatINR(branch.reg_fee)}</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Mess Availability</span>
-              <span className="font-semibold">
-                {branch.is_mess_available ? 'Available' : 'Not available'}
-              </span>
-            </div>
-            {branch.is_mess_available && (
+            {branch.is_mess_available && branch.mess_price && (
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Mess Price</span>
                 <span className="font-semibold">{formatINR(branch.mess_price)}</span>
               </div>
             )}
+            {branch.is_cooking && branch.cooking_price && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Cooking Price</span>
+                <span className="font-semibold">{formatINR(branch.cooking_price)}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Display Order</span>
+              <span className="font-semibold">{branch.display_order}</span>
+            </div>
           </div>
         </CardContent>
       </Card>

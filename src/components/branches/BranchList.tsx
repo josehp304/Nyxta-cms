@@ -99,7 +99,27 @@ const BranchList = () => {
 
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900">{branch.name}</h3>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold text-gray-900">{branch.name}</h3>
+                    {/* Badges */}
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {branch.is_ladies && (
+                        <span className="inline-block px-2 py-1 bg-pink-100 text-pink-800 text-xs font-medium rounded">
+                          👩 Ladies
+                        </span>
+                      )}
+                      {branch.is_mess_available && (
+                        <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                          🍽️ Mess
+                        </span>
+                      )}
+                      {branch.is_cooking && (
+                        <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                          👨‍🍳 Cooking
+                        </span>
+                      )}
+                    </div>
+                  </div>
                   <div className="flex space-x-2">
                     <Link
                       to={`/branches/${branch.id}/edit`}
@@ -151,11 +171,10 @@ const BranchList = () => {
                     </div>
                   </div>
 
-                  {branch.is_mess_available && (
-                    <div className="mt-3">
-                      <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                        Mess Available
-                      </span>
+                  {branch.is_cooking && branch.cooking_price && (
+                    <div className="mt-3 text-sm">
+                      <span className="text-gray-500">Cooking: </span>
+                      <span className="font-semibold text-gray-900">₹{branch.cooking_price}/month</span>
                     </div>
                   )}
                 </div>

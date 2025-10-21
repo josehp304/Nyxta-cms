@@ -26,6 +26,7 @@ const BranchForm = () => {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<BranchFormData>({
     defaultValues: {
@@ -37,11 +38,17 @@ const BranchForm = () => {
       reg_fee: 0,
       is_mess_available: false,
       mess_price: 0,
+      is_ladies: false,
+      is_cooking: false,
+      cooking_price: null,
+      display_order: 0,
       prime_location_perks: [{ title: '', distance: '', time_to_reach: '' }],
       amenities: [''],
       gmap_link: '',
     },
   });
+
+  const isCooking = watch('is_cooking');
 
   const { fields: contactFields, append: appendContact, remove: removeContact } = useFieldArray<BranchFormData>({
     control,
@@ -88,6 +95,10 @@ const BranchForm = () => {
         reg_fee: branch.reg_fee,
         is_mess_available: branch.is_mess_available,
         mess_price: branch.mess_price || 0,
+        is_ladies: branch.is_ladies,
+        is_cooking: branch.is_cooking,
+        cooking_price: branch.cooking_price ?? null,
+        display_order: branch.display_order,
         prime_location_perks: branch.prime_location_perks && branch.prime_location_perks.length > 0 
           ? branch.prime_location_perks 
           : [{ title: '', distance: '', time_to_reach: '' }],
@@ -368,6 +379,64 @@ const BranchForm = () => {
             </button>
           </div>
 
+          {/* Branch Type & Features */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">Branch Type & Features</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-2 p-3 bg-pink-50 border border-pink-200 rounded-lg">
+                <input
+                  {...register('is_ladies')}
+                  type="checkbox"
+                  id="is_ladies"
+                  className="w-4 h-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
+                />
+                <label htmlFor="is_ladies" className="text-sm font-medium text-gray-700">
+                  👩 Ladies Hostel
+                </label>
+              </div>
+
+              <div className="flex items-center space-x-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <input
+                  {...register('is_mess_available')}
+                  type="checkbox"
+                  id="is_mess_available"
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="is_mess_available" className="text-sm font-medium text-gray-700">
+                  🍽️ Mess Available
+                </label>
+              </div>
+
+              <div className="flex items-center space-x-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <input
+                  {...register('is_cooking')}
+                  type="checkbox"
+                  id="is_cooking"
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                />
+                <label htmlFor="is_cooking" className="text-sm font-medium text-gray-700">
+                  👨‍🍳 Cooking Facilities
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Display Order
+              </label>
+              <input
+                {...register('display_order', { valueAsNumber: true })}
+                type="number"
+                placeholder="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Lower numbers appear first in the branch list
+              </p>
+            </div>
+          </div>
+
           {/* Fees & Pricing */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900">Fees & Pricing</h3>
@@ -383,18 +452,6 @@ const BranchForm = () => {
               />
             </div>
 
-            <div className="flex items-center space-x-2">
-              <input
-                {...register('is_mess_available')}
-                type="checkbox"
-                id="is_mess_available"
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="is_mess_available" className="text-sm font-medium text-gray-700">
-                Mess Available
-              </label>
-            </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Mess Price (₹)
@@ -402,9 +459,30 @@ const BranchForm = () => {
               <input
                 {...register('mess_price', { valueAsNumber: true })}
                 type="number"
+                placeholder="Optional"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+              <p className="mt-1 text-xs text-gray-500">
+                Monthly cost for mess facilities (if available)
+              </p>
             </div>
+
+            {isCooking && (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Cooking Price (₹/month)
+                </label>
+                <input
+                  {...register('cooking_price', { valueAsNumber: true })}
+                  type="number"
+                  placeholder="Optional - Leave empty if free"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Monthly cost for cooking facilities (leave empty if free)
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Amenities */}
