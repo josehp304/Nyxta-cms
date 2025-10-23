@@ -146,7 +146,7 @@ const BranchForm = () => {
           (p: any) => p.title.trim() !== '' || p.distance.trim() !== '' || p.time_to_reach.trim() !== ''
         ) || [],
       };
-
+      console.log(cleanedData);
       if (isEditMode) {
         await branchService.update(Number(id), cleanedData, thumbnailFile || undefined);
       } else {

@@ -118,9 +118,13 @@ export const branchService = {
       formData.append('room_rate', JSON.stringify(data.room_rate));
       formData.append('reg_fee', String(data.reg_fee));
       formData.append('is_mess_available', String(data.is_mess_available));
+      formData.append('is_ladies', String(data.is_ladies));
+      formData.append('is_cooking', String(data.is_cooking)); 
+      formData.append('display_order', String(data.display_order));
       
       if (data.email) formData.append('email', data.email);
       if (data.mess_price) formData.append('mess_price', String(data.mess_price));
+      if (data.cooking_price !== undefined && data.cooking_price !== null) formData.append('cooking_price', String(data.cooking_price));
       if (data.prime_location_perks) formData.append('prime_location_perks', JSON.stringify(data.prime_location_perks));
       if (data.amenities) formData.append('amenities', JSON.stringify(data.amenities));
       if (data.gmap_link) formData.append('gmap_link', data.gmap_link);
@@ -162,8 +166,12 @@ export const branchService = {
     if (data.room_rate) formData.append('room_rate', JSON.stringify(data.room_rate));
     if (data.reg_fee !== undefined) formData.append('reg_fee', String(data.reg_fee));
     if (data.is_mess_available !== undefined) formData.append('is_mess_available', String(data.is_mess_available));
+    if (data.is_ladies !== undefined) formData.append('is_ladies', String(data.is_ladies));
+    if (data.is_cooking !== undefined) formData.append('is_cooking', String(data.is_cooking));
+    if (data.display_order !== undefined) formData.append('display_order', String(data.display_order));
     if (data.email) formData.append('email', data.email);
     if (data.mess_price) formData.append('mess_price', String(data.mess_price));
+    if (data.cooking_price !== undefined && data.cooking_price !== null) formData.append('cooking_price', String(data.cooking_price));
     if (data.prime_location_perks) formData.append('prime_location_perks', JSON.stringify(data.prime_location_perks));
     if (data.amenities) formData.append('amenities', JSON.stringify(data.amenities));
     if (data.gmap_link) formData.append('gmap_link', data.gmap_link);
