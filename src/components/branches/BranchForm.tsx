@@ -40,7 +40,7 @@ const BranchForm = () => {
       mess_price: 0,
       is_ladies: false,
       is_cooking: false,
-      cooking_price: null,
+      cooking_price: '',
       display_order: 0,
       prime_location_perks: [{ title: '', distance: '', time_to_reach: '' }],
       amenities: [''],
@@ -97,7 +97,7 @@ const BranchForm = () => {
         mess_price: branch.mess_price || 0,
         is_ladies: branch.is_ladies,
         is_cooking: branch.is_cooking,
-        cooking_price: branch.cooking_price ?? null,
+        cooking_price: branch.cooking_price || '',
         display_order: branch.display_order,
         prime_location_perks: branch.prime_location_perks && branch.prime_location_perks.length > 0 
           ? branch.prime_location_perks 
@@ -473,8 +473,8 @@ const BranchForm = () => {
                   Cooking Price (₹/month)
                 </label>
                 <input
-                  {...register('cooking_price', { valueAsNumber: true })}
-                  type="number"
+                  {...register('cooking_price')}
+                  type="text"
                   placeholder="Optional - Leave empty if free"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />

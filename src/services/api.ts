@@ -124,7 +124,7 @@ export const branchService = {
       
       if (data.email) formData.append('email', data.email);
       if (data.mess_price) formData.append('mess_price', String(data.mess_price));
-      if (data.cooking_price !== undefined && data.cooking_price !== null) formData.append('cooking_price', String(data.cooking_price));
+      if (data.cooking_price) formData.append('cooking_price', data.cooking_price);
       if (data.prime_location_perks) formData.append('prime_location_perks', JSON.stringify(data.prime_location_perks));
       if (data.amenities) formData.append('amenities', JSON.stringify(data.amenities));
       if (data.gmap_link) formData.append('gmap_link', data.gmap_link);
@@ -171,11 +171,10 @@ export const branchService = {
     if (data.display_order !== undefined) formData.append('display_order', String(data.display_order));
     if (data.email) formData.append('email', data.email);
     if (data.mess_price) formData.append('mess_price', String(data.mess_price));
-    if (data.cooking_price !== undefined && data.cooking_price !== null) formData.append('cooking_price', String(data.cooking_price));
+    if (data.cooking_price) formData.append('cooking_price', data.cooking_price);
     if (data.prime_location_perks) formData.append('prime_location_perks', JSON.stringify(data.prime_location_perks));
     if (data.amenities) formData.append('amenities', JSON.stringify(data.amenities));
     if (data.gmap_link) formData.append('gmap_link', data.gmap_link);
-
     const response = await api.put<ApiResponse<Branch>>(`/api/branches/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });

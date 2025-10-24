@@ -154,13 +154,13 @@ const BranchDetails = () => {
             {branch.is_mess_available && branch.mess_price && (
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Mess Price</span>
-                <span className="font-semibold">{formatINR(branch.mess_price)}</span>
+                <span className="font-semibold">{branch.mess_price}</span>
               </div>
             )}
             {branch.is_cooking && branch.cooking_price && (
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Cooking Price</span>
-                <span className="font-semibold">{formatINR(branch.cooking_price)}</span>
+                <span className="font-semibold">{branch.cooking_price}</span>
               </div>
             )}
             <div className="flex items-center justify-between">

@@ -34,7 +34,7 @@ export interface Branch {
   mess_price?: number;
   is_ladies: boolean;
   is_cooking: boolean;
-  cooking_price?: number | null;
+  cooking_price?: string | null;
   display_order: number;
   prime_location_perks?: PrimeLocationPerk[];
   amenities?: string[];
